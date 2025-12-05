@@ -5,248 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ashby One Dashboard Guide</title>
   <style>
-    :root {
-      --bg-gradient: radial-gradient(100% 140% at 50% 10%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 40%), radial-gradient(120% 120% at 15% 30%, rgba(255,228,217,0.5) 0%, rgba(255,228,217,0) 55%), radial-gradient(120% 120% at 85% 70%, rgba(255,228,217,0.35) 0%, rgba(255,228,217,0) 60%), linear-gradient(135deg, #4f4c9f 0%, #6f6fcf 50%, #8b8ff1 100%);
-      --nav-bg: linear-gradient(180deg, #0f0f28 0%, #1c1c44 100%);
-      --pill-bg: #0f0f28;
-      --accent: #ffffff;
-      --text-muted: rgba(255,255,255,0.75);
-      --card-bg: rgba(15, 15, 40, 0.28);
-      --card-border: rgba(255,255,255,0.18);
-      --shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
-      font-family: "Montserrat", "Avenir Next", "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg-gradient);
-      color: var(--accent);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 32px 18px 64px;
-    }
-
-    header {
-      width: min(1200px, 100%);
-      background: var(--nav-bg);
-      color: var(--accent);
-      border-radius: 22px;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
-
-    .brand span:first-child {
-      font-size: 18px;
-    }
-
-    .brand span:last-child {
       background: #ffffff;
-      color: #0f0f28;
-      padding: 6px 9px;
-      border-radius: 8px;
-      font-size: 14px;
-      letter-spacing: 0.8px;
-    }
-
-    nav {
+      color: #111111;
       display: flex;
       align-items: center;
-      gap: 14px;
+      justify-content: center;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      padding: 24px;
     }
-
-    nav a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      padding: 8px 12px;
-      border-radius: 12px;
-      transition: all 0.2s ease;
-    }
-
-    nav a:hover {
-      background: rgba(255,255,255,0.12);
-    }
-
-    .cta {
-      background: #ffffff;
-      color: #0f0f28;
-      border: none;
-      border-radius: 16px;
-      padding: 10px 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-    }
-
-    .cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 30px rgba(0,0,0,0.3);
-    }
-
-    main {
-      width: min(1100px, 100%);
-      margin-top: 64px;
-      display: grid;
-      gap: 28px;
-      justify-items: center;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(34px, 5vw, 52px);
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .subtitle {
-      margin: 6px 0 20px;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 12px 20px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.12);
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      box-shadow: var(--shadow);
-    }
-
-    .cards {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 18px;
-      text-align: left;
-      color: var(--accent);
-      box-shadow: 0 16px 40px rgba(15, 15, 40, 0.28);
-      backdrop-filter: blur(6px);
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
+    p {
+      max-width: 720px;
       font-size: 18px;
-      letter-spacing: 0.3px;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--text-muted);
-      line-height: 1.5;
-      font-weight: 500;
-    }
-
-    .steps {
-      margin: 8px 0 0;
-      padding-left: 18px;
-      color: var(--accent);
       line-height: 1.6;
-    }
-
-    .steps li { margin-bottom: 6px; }
-
-    footer {
-      margin-top: 24px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    @media (max-width: 640px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      nav { width: 100%; justify-content: space-between; }
-      .cards { grid-template-columns: 1fr; }
-      body { padding: 20px 16px 48px; }
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <span>Ashby</span>
-      <span>ONE</span>
-    </div>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Docs</a>
-      <a href="#">Support</a>
-      <button class="cta">Get Tickets</button>
-    </nav>
-  </header>
-
-  <main>
-    <div>
-      <h1>Ashby One Dashboard</h1>
-      <p class="subtitle">Quick start guide for leaders and recruiting teams</p>
-      <span class="pill">3‑step setup · Takes ~10 minutes</span>
-    </div>
-
-    <div class="cards">
-      <section class="card">
-        <h3>1) Connect your data</h3>
-        <p>Link ATS and HRIS sources so dashboards stay live. Use service accounts for stable credentials.</p>
-        <ul class="steps">
-          <li>Open Settings → Integrations → Add Source.</li>
-          <li>Grant read-only scopes; verify the sync preview.</li>
-          <li>Schedule nightly refreshes; enable alerts on failures.</li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <h3>2) Configure the dashboard</h3>
-        <p>Pin the metrics you review weekly and set owners. Use tags to group boards by team.</p>
-        <ul class="steps">
-          <li>Create a board → “Talent Leadership”.</li>
-          <li>Add widgets: Pipeline health, Time-to-fill, DEI funnel, Offer acceptance.</li>
-          <li>Share with leadership; lock layout once finalized.</li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <h3>3) Notify the right people</h3>
-        <p>Keep everyone aligned with scheduled sends and threshold alerts.</p>
-        <ul class="steps">
-          <li>Enable Monday 8 AM email digests for the board.</li>
-          <li>Set alerts: “Offer acceptance &lt; 70%” and “Aging reqs &gt; 30 days”.</li>
-          <li>Post to Slack: #talent-leadership when alerts fire.</li>
-        </ul>
-      </section>
-    </div>
-  </main>
-
-  <footer>Need help? Reach out to the Ashby One team anytime.</footer>
+  <p>
+    This dashboard shows all Ashby One conference registrations for 2026. To filter for a specific conference, open Advanced Filters, select Add filter, search for Event Name, and set it to contains Any Of and then enter either London or San Francisco.
+  </p>
 </body>
 </html>
