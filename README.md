@@ -27,6 +27,26 @@ the offline/PWA features work; you can also open the file directly).
 4. **Backup** – data is local-only, so export a backup regularly (and to move
    to another device). Also sets how many new faces to introduce per session.
 
+## Capturing photos from the directory (bookmarklet)
+
+Instead of OCR'ing screenshots, you can pull photos straight from
+`directory.churchofjesuschrist.org`, where the names are already in the page's
+HTML (so they're exact, no typos).
+
+1. Open `bookmarklet/install.html` and drag **Grab Ward Photos** to your
+   bookmarks bar (or copy the URL from `bookmarklet/grab-directory.bookmarklet.txt`
+   into a bookmark).
+2. Log in to the directory and open your ward (or a household).
+3. Click the bookmark. It reads every member + family photo and downloads
+   `ward-photos.zip` — unzip it for a folder of images named after each person
+   (e.g. `Erik Alvarez.jpg`, `Alvarez, Erik & Jenna.jpg`).
+
+It runs entirely in your browser using your logged-in session; nothing is sent
+anywhere else. People without a profile photo are reported and skipped.
+
+To change the bookmarklet, edit `bookmarklet/grab-directory.src.js` and rebuild
+with `node bookmarklet/build.mjs`.
+
 ## How the learning works
 
 A spaced-repetition scheduler (an SM-2 variant) tracks how well you know each
