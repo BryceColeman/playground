@@ -44,6 +44,10 @@ HTML (so they're exact, no typos).
 It runs entirely in your browser using your logged-in session; nothing is sent
 anywhere else. People without a profile photo are reported and skipped.
 
+4. Unzip `ward-photos.zip`, open the app, go to **Import → From photo files**,
+   and select all the images. Each file name becomes the person's name (no OCR,
+   no typing) — review and save, then start studying.
+
 To change the bookmarklet, edit `bookmarklet/grab-directory.src.js` and rebuild
 with `node bookmarklet/build.mjs`.
 

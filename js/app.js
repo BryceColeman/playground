@@ -237,7 +237,150 @@ async function renderImport() {
   reviewCards = [];
   main.innerHTML = `
     <section class="import">
-      <h3>Import directory screenshots</h3>
+      <h3>Import</h3>
+      <div class="import-tabs">
+        <button class="tab active" data-tab="named">📁 From photo files</button>
+        <button class="tab" data-tab="ocr">🖼️ From screenshots (OCR)</button>
+      </div>
+      <div id="tab-named"></div>
+      <div id="tab-ocr" class="hidden"></div>
+    </section>`;
+  const tabs = main.querySelectorAll('.tab');
+  tabs.forEach((t) => {
+    t.onclick = () => {
+      tabs.forEach((x) => x.classList.toggle('active', x === t));
+      $('#tab-named').classList.toggle('hidden', t.dataset.tab !== 'named');
+      $('#tab-ocr').classList.toggle('hidden', t.dataset.tab !== 'ocr');
+    };
+  });
+  renderNamedTab();
+  renderOcrTab();
+}
+
+// ── Import: named photo files (the bookmarklet's ZIP, unzipped) ──
+// Turn a file name into a name guess. Handles the two formats the grabber
+// produces: "Erik Alvarez" (a person) and "Alvarez, Erik & Jenna" (a family).
+function parseFilename(filename) {
+  const base = filename
+    .replace(/\.[^.]+$/, '') // extension
+    .replace(/\s*\(\d+\)$/, '') // " (2)" de-dupe suffix
+    .replace(/_+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (base.includes(',')) {
+    const last = base.slice(0, base.indexOf(',')).trim();
+    const rest = base.slice(base.indexOf(',') + 1).trim();
+    return { firstName: rest, lastName: last, household: last, family: true };
+  }
+  const parts = base.split(' ').filter(Boolean);
+  const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+  const firstName =
+    parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0] || '';
+  return { firstName, lastName, household: lastName, family: false };
+}
+
+let namedCards = []; // {blob, firstName, lastName, household, include, family}
+
+function renderNamedTab() {
+  const host = $('#tab-named');
+  host.innerHTML = `
+    <p class="muted small">Unzip <code>ward-photos.zip</code> from the bookmarklet,
+      then pick all the images below. Each file name becomes the person's name —
+      no typing, no OCR. Review and save.</p>
+    <input type="file" id="namedFiles" accept="image/*" multiple>
+    <label class="block small"><input type="checkbox" id="incFamily"> also include family group photos</label>
+    <div id="namedReview"></div>`;
+  namedCards = [];
+  $('#namedFiles').onchange = (e) => {
+    namedCards = [...e.target.files]
+      .filter((f) => f.type.startsWith('image/'))
+      .map((f) => ({ blob: f, ...parseFilename(f.name) }))
+      .map((c) => ({ ...c, include: !c.family }));
+    $('#incFamily').checked = false;
+    renderNamedReview();
+  };
+  $('#incFamily').onchange = (e) => {
+    namedCards.forEach((c) => {
+      if (c.family) c.include = e.target.checked;
+    });
+    renderNamedReview();
+  };
+}
+
+function renderNamedReview() {
+  const wrap = $('#namedReview');
+  if (!namedCards.length) {
+    wrap.innerHTML = '';
+    return;
+  }
+  const n = namedCards.filter((c) => c.include).length;
+  wrap.innerHTML = `
+    <div class="review-head">
+      <h4>Review &amp; save</h4>
+      <button class="btn-primary" id="saveNamed" ${n ? '' : 'disabled'}>Save ${n}</button>
+    </div>
+    <div class="review-grid"></div>`;
+  const grid = $('.review-grid', wrap);
+  namedCards.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-card' + (card.include ? '' : ' dimmed');
+    div.innerHTML = `
+      <label class="incl"><input type="checkbox" ${card.include ? 'checked' : ''} data-incl="${i}"> use${card.family ? ' (family)' : ''}</label>
+      <div class="thumb"></div>
+      <input class="ri" data-field="firstName" data-i="${i}" placeholder="First" value="${esc(card.firstName)}">
+      <input class="ri" data-field="lastName" data-i="${i}" placeholder="Last" value="${esc(card.lastName)}">
+      <input class="ri" data-field="household" data-i="${i}" placeholder="Household" value="${esc(card.household)}">`;
+    const img = document.createElement('img');
+    img.className = 'thumb-img';
+    img.src = URL.createObjectURL(card.blob);
+    img.onload = () => URL.revokeObjectURL(img.src);
+    $('.thumb', div).appendChild(img);
+    grid.appendChild(div);
+  });
+  grid.querySelectorAll('.ri').forEach((inp) => {
+    inp.oninput = () => {
+      namedCards[inp.dataset.i][inp.dataset.field] = inp.value;
+    };
+  });
+  grid.querySelectorAll('[data-incl]').forEach((cb) => {
+    cb.onchange = () => {
+      namedCards[cb.dataset.incl].include = cb.checked;
+      renderNamedReview();
+    };
+  });
+  $('#saveNamed').onclick = saveNamed;
+}
+
+async function saveNamed() {
+  const chosen = namedCards.filter(
+    (c) => c.include && (c.firstName || c.lastName)
+  );
+  let saved = 0;
+  for (const c of chosen) {
+    const householdId = await ensureHousehold(c.household);
+    await putPerson({
+      id: uid(),
+      firstName: (c.firstName || '').trim(),
+      lastName: (c.lastName || '').trim(),
+      householdId,
+      photo: c.blob,
+      notes: '',
+      srs: freshSrs(),
+      stats: freshStats(),
+      createdAt: Date.now(),
+    });
+    saved++;
+  }
+  $('#namedReview').innerHTML = `<div class="empty">
+    <p>✓ Saved ${saved} ${saved === 1 ? 'person' : 'people'}. Ready to study!</p>
+    <button class="btn-primary" id="toStudyNamed">Start studying</button></div>`;
+  $('#toStudyNamed').onclick = () => route('study');
+}
+
+// ── Import: screenshots via OCR ──
+function renderOcrTab() {
+  const host = $('#tab-ocr');
+  host.innerHTML = `
       <p class="muted small">Screenshots stay on your device. Pick one or more,
         line up the grid to the cards, then run OCR. You'll review every name
         before it's saved.</p>
@@ -254,8 +397,7 @@ async function renderImport() {
         <button class="btn-primary" id="runOcr">Run OCR</button>
         <div id="ocrProgress" class="muted small"></div>
       </div>
-      <div id="review"></div>
-    </section>`;
+      <div id="review"></div>`;
 
   $('#files').onchange = async (e) => {
     importImages = [];
