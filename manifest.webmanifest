@@ -1,0 +1,14 @@
+{
+  "name": "Ward Names",
+  "short_name": "Ward Names",
+  "description": "Learn the names of families in your ward with spaced-repetition quizzes.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0e1a",
+  "theme_color": "#4834d4",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
